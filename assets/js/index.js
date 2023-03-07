@@ -1,27 +1,3 @@
-// class Customer {
-//     constructor(id, fullName, email, phone, address, balance) {
-//         this.id = id;
-//         this.fullName = fullName;
-//         this.email = email;
-//         this.phone = phone;
-//         this.address = address;
-//         this.balance = balance;
-//     }
-// }
-
-// class Deposit {
-//     constructor(id, customerId, transactionAmount, createdAt, createdBy, updatedAT, updatedBy, isDeleted) {
-//         this.id = id;
-//         this.customerId = customerId;
-//         this.transactionAmount = transactionAmount;
-//         this.createdAt = createdAt;
-//         this.createdBy = createdBy;
-//         this.updatedAt = updatedAT;
-//         this.updatedBy = updatedBy;
-//         this.isDeleted = isDeleted;
-//     }
-// }
-
 let customers = [];
 
 let currentCustomer = null;
@@ -45,7 +21,7 @@ function addEventShowUpdate() {
 }
 
 function addEventExitModalUpdate() {
-    $('.update').off('show');
+    $('#modalUpdate').modal('hide');
 }
 
 
@@ -62,20 +38,9 @@ function addEventShowTransfer() {
 }
 
 let findCustomerById = (id) => {
-    return customers.find(item => item.id == id);
+    return customers.find(item => item.id == id); 
 }
 
-let updateCustomerById = (obj) => {
-    customers.filter(item =>{
-        if(item.id === obj.id){
-            item.fullNamev = obj.fullName;
-            item.email =obj.email;
-            item.phone = obj.phone;
-            item.address =obj.address;
-            
-        }
-    })
-}
 
 $('#btnCreateCustomer').on('click', () => {
 
@@ -96,17 +61,23 @@ $('#btnCreateCustomer').on('click', () => {
 
     customers.push(customer);
 
+    Swal.fire({
+        icon: 'success',
+        title: "Create successfully",
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000
+    })
+
     addEventExitModalCreate();
 
     let str = renderCustomer(customer);
     $('#tbCustomer tbody').append(str);
 
-    // addEventExitModalUpdate();
+    addEventExitModalCreate();
 
-    
-
-    $('.update').on('click', () => {
-        addEventShowUpdate();
+    $('.update').on('click', function() {
+        
 
         let id = $(this).data('id');
 
@@ -114,24 +85,44 @@ $('#btnCreateCustomer').on('click', () => {
         
 
         if (customer !== undefined) {
+
             currentCustomer = customer;
 
-            $("#fullNameUp").val(currentCustomer.fullName);
-            $('#emailUp').val(currentCustomer.email);
-            $('#phone').val(currentCustomer.phone);
-            $('#address').val(currentCustomer.address);
-            $('#balance').val(currentCustomer.balance);
+            $("#fullNameUp").val(customer.fullName);
+            $('#emailUp').val(customer.email);
+            $('#phoneUp').val(customer.phone);
+            $('#addressUp').val(customer.address);
+            $('#balanceUp').val(customer.balance);
+
+            addEventShowUpdate();
 
         }
         else {
-            alert('Customer not found');
+            Swal.fire({
+                icon: 'error',
+                title: 'Warning',
+                text: 'Customer not found',
+            });
         }
 
     })
 
 })
 
+let updateCustomerById = (obj) => {
+    customers.filter(item =>{
+        if(item.id === obj.id){
+            item.fullName = obj.fullName;
+            item.email =obj.email;
+            item.phone = obj.phone;
+            item.address =obj.address;
+            
+        }
+    })
+}
+
 $('#btnUpdateCustomer').on('click', () => {
+    
     let id = currentCustomer.id;
     let fullName = $('#fullNameUp').val();
     let email = $('#emailUp').val();
@@ -146,12 +137,19 @@ $('#btnUpdateCustomer').on('click', () => {
     currentCustomer.address = address;
 
     updateCustomerById(currentCustomer);
+    console.log(currentCustomer);
+
+    let newRow = renderCustomer(currentCustomer);
+    let currentRow = $('#tr_' + id);
+
+    currentRow.replaceWith(newRow);
    
-    addEventExitModalUpdate();
+    addEventExitModalUpdate(); 
+    
 })
 
 let generalId = () => {
-    return "id" + Math.random().toString(12).slice(2);
+    return  Math.random().toString(16).slice(13);
 }
 
 
